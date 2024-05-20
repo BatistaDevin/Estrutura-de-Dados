@@ -1,0 +1,137 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+struct Carro {
+    char modelo[20];
+    int ano;
+};
+
+struct Node {
+    struct Carro carro;
+    struct Node *prev;
+    struct Node *next;
+};
+
+struct Node* criarNode(struct Carro carro) {
+    struct Node* novoNode = (struct Node*)malloc(sizeof(struct Node));
+    novoNode->carro = carro;
+    novoNode->prev = NULL;
+    novoNode->next = NULL;
+    return novoNode;
+}
+
+void inserirNovoCarro(struct Node** head, struct Carro carro) {
+    struct Node* novoNode = criarNode(carro);
+    if (*head == NULL) {
+        *head = novoNode;
+    } else {
+        struct Node* temp = *head;
+        while (temp->next != NULL) {
+            temp = temp->next;
+        }
+        temp->next = novoNode;
+        novoNode->prev = temp;
+    }
+}
+
+void excluirCarro(struct Node** head, int pos) {
+    if (*head == NULL) return;
+    struct Node* temp = *head;
+    
+    for (int i = 0; i < pos; i++) {
+        if (temp == NULL) return;
+        temp = temp->next;
+    }
+
+    if (temp == NULL) return;
+    
+    if (temp->prev != NULL) {
+        temp->prev->next = temp->next;
+    } else {
+        *head = temp->next;
+    }
+    
+    if (temp->next != NULL) {
+        temp->next->prev = temp->prev;
+    }
+    
+    free(temp);
+}
+
+void mostrarTodosCarros(struct Node* head) {
+    struct Node* temp = head;
+    while (temp != NULL) {
+        printf("\nMarca: %s", temp->carro.modelo);
+        printf("\nAno: %d", temp->carro.ano);
+        printf("\n=================\n\n");
+        temp = temp->next;
+    }
+}
+
+void mostrarCarroDesejado(struct Node* head, int pos) {
+    struct Node* temp = head;
+    for (int i = 0; i < pos; i++) {
+        if (temp == NULL) return;
+        temp = temp->next;
+    }
+    if (temp != NULL) {
+        printf("\nMarca: %s", temp->carro.modelo);
+        printf("\nAno: %d", temp->carro.ano);
+        printf("\n=================\n\n");
+    } else {
+        printf("Posição inválida!\n");
+    }
+}
+
+void menu() {
+    printf("\nMenu:\n");
+    printf("1. Inserir novo carro\n");
+    printf("2. Excluir carro\n");
+    printf("3. Mostrar todos os carros\n");
+    printf("4. Mostrar carro desejado\n");
+    printf("5. Sair\n");
+    printf("Escolha uma opção: ");
+}
+
+int main() {
+    struct Node* head = NULL;
+    int opcao, pos;
+    struct Carro carro;
+    
+    do {
+        menu();
+        scanf("%d", &opcao);
+        switch (opcao) {
+            case 1:
+                printf("Marca: ");
+                scanf("%s", carro.modelo);
+                printf("Ano: ");
+                scanf("%d", &carro.ano);
+                inserirNovoCarro(&head, carro);
+                break;
+            case 2:
+                printf("Informe a posição do carro a ser excluído: ");
+                scanf("%d", &pos);
+                excluirCarro(&head, pos);
+                break;
+            case 3:
+                mostrarTodosCarros(head);
+                break;
+            case 4:
+                printf("Informe a posição do carro a ser mostrado: ");
+                scanf("%d", &pos);
+                mostrarCarroDesejado(head, pos);
+                break;
+            case 5:
+                printf("Saindo...\n");
+                break;
+            default:
+                printf("Opção inválida!\n");
+                break;
+        }
+    } while (opcao != 5);
+    
+    return 0;
+}
+
